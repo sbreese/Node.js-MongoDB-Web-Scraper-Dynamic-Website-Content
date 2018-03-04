@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<!--[if lt IE 9]><html class="ie"><![endif]-->
+<!--[if !IE]><!--><html><!--<![endif]-->
+<head>
+
+    <% include ../partials/header.ejs %>
+
+</head>
+
+<body lang="en">
+<div id="container-nav">
+    <section id="nav" class="group wrapper">
+        <h3><a href="/" style="padding: 0">Steve Breese</a></h3>
+        
+        <% include ../partials/nav.ejs %>
+
+    </section>
+</div>
+<% include ../partials/header-html.ejs %>
+<div id="container-content">
+    <article id="content">
+
+        <!-- Classes removed / #portfolio -->
+        <!-- Element(s)/Classes added from Bootstrap's Scaffolding -->
+
+        <section id="portfolio" class="container-fluid">
+
+            <link href="./stylesheets/app-demo.css" rel="stylesheet">
+            <div class="header">
+                <h1 class="h1">Node.js Development Topics</h1>
+                </header>
+
+            <div class="row">
+
+                <!-- ///////////////////////// BEGIN CONTENT ///////////////////////////// -->
+
+                    <div class="btn-wrap">
+                        <div class="btn">
+                            <a href="https://github.com/sbreese/Node-js-MongoDB-Web-Scraping-Dynamic-Website-Content.js/archive/master.zip"><i class="fa fa-file-zip-o"></i> Download Zip</a>
+                        </div>
+                        <div class="btn">
+                            <a href="https://github.com/sbreese/Node-js-MongoDB-Web-Scraping-Dynamic-Website-Content.js"><i class="fa fa-github"></i> View on GitHub</a>
+                        </div>
+                    </div>
+
+                    <h2>Demo</h2>
+
+                <% if (pageContent) { %>
+                <div><%- pageContent.html %></div>
+                <% } else { %>
+                <div>Page Content could not be retrieved from MongoDB</div>
+                <% } %>
+
+<script>
+$(document).ready(function() {
+    $(".tablesorter").tablesorter();
+});
+</script>
+
+                <!-- /////////////////////////  END CONTENT ////////////////////////////// -->
+
+            </div>
+
+</div>
+
+</section>
+
+</article>
+</div>
+<% include ../partials/footer.ejs %>
+</body>
+</html>

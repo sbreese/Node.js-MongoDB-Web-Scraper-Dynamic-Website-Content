@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<!--[if lt IE 9]><html class="ie"><![endif]-->
+<!--[if !IE]><!--><html><!--<![endif]-->
+<head>
+
+    <% include ../partials/header.ejs %>
+
+</head>
+
+<body lang="en">
+<div id="container-nav">
+    <section id="nav" class="group wrapper">
+        <h3><a href="/" style="padding: 0">Steve Breese</a></h3>
+        <!-- Checkbox Hack markup -->
+        <input type="checkbox" id="toggle" />
+        <label for="toggle" onclick>Menu</label>
+        <!-- /Checkbox Hack markup -->
+        <% include ../partials/nav.ejs %>
+
+    </section>
+</div>
+<% include ../partials/header-html.ejs %>
+<div id="container-content">
+    <article id="content">
+
+        <!-- Classes removed / #portfolio -->
+        <!-- Element(s)/Classes added from Bootstrap's Scaffolding -->
+
+        <section id="portfolio" class="container-fluid">
+
+            <header>
+                <h3>About Steve</h3>
+                <p></p>
+            </header>
+
+            <div class="row">
+
+                    <!-- ///////////////////////// BEGIN CONTENT ///////////////////////////// -->
+<style>
+.disabled {
+    color: gray;
+}
+.fake-link {
+    color: #337ab7;
+    cursor: pointer;
+}
+</style>
+
+<button id="perform-scraping">SCRAPE NODE TOPICS!</button>
+<div id="scrape-node-topics" class="row"></div>
+<div id="node-topics-dependencies">
+<link rel="stylesheet" type="text/css" href="./js/lib/jquery.tablesorter/themes/blue/style.css" type="text/css" />
+
+<script src="https://use.fontawesome.com/c76a6ebbea.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+<script src="./js/lib/jquery.tablesorter/jquery.tablesorter.js"></script>
+
+<script>
+$("#scrape-node-topics").on('mouseenter', "#node_topics tr", function() {
+    $(this).find("span.unchecked").replaceWith(function() {
+
+        var moduleName = $.trim($(this).data("module-name"));
+        var url;
+        if (doesURLexist(url = 'https://nodejs.org/dist/latest-v9.x/docs/api/' + moduleName + '.html') !== 404 || doesURLexist(url = 'https://www.npmjs.com/package/' + moduleName) !== 404) {
+            return '<a href="' + url + '" target="_blank">' + $(this).text() + '</a>';
+        } else {
+            return '<span class="disabled" target="_blank">' + $(this).text() + '</span>';
+        }
+
+    });
+
+});
+
+function doesURLexist(url) {
+    var request;
+    if (window.XMLHttpRequest)
+        request = new XMLHttpRequest();
+    else
+        request = new ActiveXObject("Microsoft.XMLHTTP");
+    request.open('GET', '/proxyAjax?url=' + url, false);
+    request.send(); // there will be a 'pause' here until the response to come.
+    // the object request will be actually modified
+    return request.status;
+}
+</script>
+
+</div>
+<script>
+$(document).ready(function() {
+
+    function scrapeNodeTopics() {
+        $.ajax({
+            type: "POST",
+            url: "/scrapeNodeTopics",
+            timeout: 10000,
+            dataType: "json",
+            data: JSON.stringify({ site_to_scrape: "w3schools.com" }),
+            contentType: "application/json; charset=utf-8",
+            success: function(data) {
+                //show content
+                $("#scrape-node-topics").html('<div class="col-md-6"><h4>Node.js</h4><table id="node_topics" class="tablesorter"><thead><th>Topic</th><th>Module</th></thead><tbody></tbody></table></div>');
+                $("#scrape-node-topics").append('<div class="col-md-6"><h4>Node.js Database Drivers</h4></h4><table id="db_topics" class="tablesorter"><thead><th>MySQL</th><th>MongoDB</th><th>Method</th></thead><tbody></tbody></table></div>');
+                data.forEach(displayInTable);
+            },
+            error: function(jqXHR, textStatus, err) {
+                //show error message
+                alert('text status '+textStatus+', err '+err)
+            }
+        });
+
+    }//scrapeNodeTopics()
+
+    $('#perform-scraping').on('click', function() {
+        scrapeNodeTopics();
+    });
+
+}); // end jQuery ready
+
+var i = 0, j = 0;
+function displayInTable(item, index) {
+
+    if (item.topicLabel.includes('Built-')) {
+        scrapeNodeModules();
+    } else if (!item.w3schoolsPage.includes(':') && !item.topicLabel.includes('RasPi')) {
+
+        if (item.topicLabel.includes('MySQL')) {
+            $('#db_topics > tbody:last-child').append('<tr id="' + item.w3schoolsPage.replace(".asp", "") + '"><td><a href="https://www.w3schools.com/nodejs/' + item.w3schoolsPage + '">' + item.topicLabel.replace("MySQL ", "").replace("Get Started", "Create Connection") + '</a></td><td id="MongoDB_' + i + '"></td><td id="MongoDB_method_' + i + '"></td></tr>');
+            i++;
+        } else if (item.topicLabel.includes('MongoDB')) {
+            $("#db_topics td#MongoDB_" + j).html('<a href="https://www.w3schools.com/nodejs/' + item.w3schoolsPage + '">' + item.topicLabel.replace("MongoDB ", "").replace("Get Started", "Create Client").replace("Create Database", "Create Connection & Database") + '</a>');
+            $("#db_topics td#MongoDB_method_" + j).html('<a href="' + item.mongodbMethod.reference + '">' + item.mongodbMethod.method + '</a>');
+            j++;
+        } else {
+            $('#node_topics > tbody:last-child').append('<tr id="' + item.w3schoolsPage.replace(".asp", "") + '"><td><a href="https://www.w3schools.com/nodejs/' + item.w3schoolsPage + '">' + item.topicLabel.replace("Node.js ", "") + '</a></td><td>loading...</td></tr>');
+            displayNodejsModules(item.w3schoolsPage, item.nodejsModules);
+        }
+    }
+}
+
+
+var modulesCovered = [];
+function scrapeNodeModules() {
+    modulesCovered = [];
+    $.ajax({
+        type: "POST",
+        url: "/scrapeNodeTopics",
+        timeout: 10000,
+        dataType: "json",
+        data: JSON.stringify({ table_to_scrape: "Node.js Built-in Modules" }),
+        contentType: "application/json; charset=utf-8",
+        success: function(data) {
+            data.forEach(displayInTable);
+            $(".tablesorter").tablesorter();
+            saveFormattedContent();
+        },
+        error: function(jqXHR, textStatus, err) {
+            //show error message
+            alert('text status '+textStatus+', err '+err)
+        }
+    });
+}
+
+function saveFormattedContent() {
+    $.ajax({
+        type: "POST",
+        url: "/Bottleneck-City/api/scrapedContent",
+        timeout: 10000,
+        dataType: "json",
+        data: JSON.stringify({ name: "Node Topics", html: $("#scrape-node-topics").wrap('<p/>').parent().html() + $("#node-topics-dependencies").html() }),
+        contentType: "application/json; charset=utf-8",
+        success: function(data) {
+            //console.log("wow: ", data);
+        },
+        error: function(jqXHR, textStatus, err) {
+            console.log("fail: ", textStatus, err);
+        }
+    });
+}
+
+function displayNodejsModules(topic_code, modules) {
+
+    $("#" + topic_code.replace(".asp", "") + " td:eq(1)").html(modules ? modules.map(e => e.span).join(', ') : '(none)');
+
+}//grabModuleNames()
+</script>
+
+                    <!-- /////////////////////////  END CONTENT ////////////////////////////// -->
+
+            </div>
+
+</div>
+
+</section>
+
+</article>
+</div>
+<% include ../partials/footer.ejs %>
+</body>
+</html>
