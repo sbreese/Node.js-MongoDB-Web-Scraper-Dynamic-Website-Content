@@ -9,20 +9,6 @@ var app = express();
 
 app.set('port', (process.env.PORT || 5000));
 
-// Alow cross origin requests
-var allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-
-    // intercept OPTIONS method
-    if ('OPTIONS' == req.method) {
-        res.send(200);
-    } else {
-        next();
-    }
-};
-app.use(allowCrossDomain);
 app.use(express.static(path.join(__dirname, 'public'))); // Use express.static middleware to serve up the static files in our public/ directory
 
 app.use(bodyParser.json()); // for screen scraper
@@ -36,7 +22,6 @@ app.get('/Node-js-Web-Scraping', function(request, response) {
     response.render('pages/Node-js-Web-Scraping');
 });
 
-//var ctrlScrapedContent = require('./app_api/controllers/scrapedContent');
 var mongoose = require('mongoose');
 var Content = mongoose.model('ScrapedContent');
 app.get('/Dynamic-Website-Content-with-MongoDB', function(request, response) {
